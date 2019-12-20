@@ -18,12 +18,12 @@ class Motors:
         self.powerR = 0 
         self.powerL = 0 
 
-        rospy.Subscriber("right_thruster", Float64, self.right_callback)
-        rospy.Subscriber("left_thruster", Float64, self.left_callback)
+        rospy.Subscriber("/usv_control/controller/right_thruster", Float64, self.right_callback)
+        rospy.Subscriber("/usv_control/controller/left_thruster", Float64, self.left_callback)
 
         self.r_pwm_pub = rospy.Publisher("rpwm", UInt16, queue_size=10)
         self.l_pwm_pub = rospy.Publisher("lpwm", UInt16, queue_size=10)
-        self.flag_pub = rospy.Publisher("flag", UInt8, queue_size=10)
+        self.flag_pub = rospy.Publisher("/arduino_br/ardumotors/flag", UInt8, queue_size=10)
 
     def right_callback(self, right_t):
         self.powerR = right_t.data
