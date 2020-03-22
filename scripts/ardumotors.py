@@ -1,4 +1,19 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+'''
+----------------------------------------------------------
+    @file: ardumotors.py
+    @date: Oct 2019
+    @date_modif: Sun Mar 22, 2020
+    @author: Alejandro Gonzalez
+    @e-mail: alexglzg97@gmail.com
+    @co-author: Sebastian Martinez Perez
+    @e-mail: sebas.martp@gmail.com
+    @brief: Blue Robotics T200 thrusters interfaced with Arduino
+    Open source
+----------------------------------------------------------
+'''
 
 import os
 import time
@@ -10,7 +25,7 @@ from std_msgs.msg import UInt8
 
 class Motors:
     def __init__(self):
-        self.activate = True
+        self.active = True
 
         self.max_pwm = 1900
         self.min_pwm = 1100
@@ -41,8 +56,14 @@ class Motors:
         self.power_left = left_t.data
         #rospy.logwarn(self.power_left)
 
-    def send_pwm(self, power_right=self.stop_pwm, power_left=self.stop_pwm):
-        #validate the pwm range
+    def send_pwm(self, power_right, power_left):
+        '''
+        @name: send_pwm
+        @brief: PWM signal topic publishing for rosserial arduino, and flag for asmc to start.
+        @param: power_right: PWM value of the right thruster
+                power_left: PWM value of the left thruster
+        @return: --
+        '''
         if power_right < self.min_pwm or power_right > self.max_pwm or power_left < self.min_pwm or power_left > self.max_pwm:
             rospy.logwarn("Thruster power must be between 1100 - 1900")
         else:
@@ -54,7 +75,13 @@ class Motors:
             self.flag_pub.publish(flag)
 
     def newtons_to_pwm(self, power_right=0, power_left=0):
-        #validate the Newtons range
+        '''
+        @name: newtons_to_pwm
+        @brief: Conversion of thrust value from Newtons to PWM.
+        @param: power_right: Newtons value of the right thruster
+                power_left: Newtons value of the left thruster
+        @return: --
+        '''
         if (power_right < self.min_thrust or power_right > self.max_thrust or power_left < self.min_thrust or power_left > self.max_thrust):
             rospy.logwarn("Saturation range")
             pwm_right = power_right * 0.5
@@ -79,7 +106,7 @@ def main():
     rospy.init_node('ardumotors', anonymous=False)
     rate = rospy.Rate(100) # 100hz
     motors = Motors()
-    while not rospy.is_shutdown() and motors.activate:
+    while not rospy.is_shutdown() and motors.active:
         motors.run(motors.power_right, motors.power_left)
         rate.sleep()
     rospy.spin()
